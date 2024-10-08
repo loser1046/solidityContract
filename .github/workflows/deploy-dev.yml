@@ -15,6 +15,7 @@ jobs:
 
       - name: Setup SSH
         run: |
+          eval $(ssh-agent -s)  # 启动 SSH 代理
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
           ssh-add private_key
@@ -27,3 +28,6 @@ jobs:
         env:
           SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
+          
+      - name: Cleanup
+        run: rm private_key
