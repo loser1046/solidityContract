@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Add SSH Key
         run: |
@@ -19,9 +19,14 @@ jobs:
           chmod 600 deploy_key.pem
 
       - name: Test SSH Connection
+        env:
+          DEPLOY_KEY: deploy_key.pem
         run: |
-          ssh -o StrictHostKeyChecking=no -i deploy_key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_ADDRESS }} "echo 'SSH connection successful!'"
+          ssh -o StrictHostKeyChecking=no -i $DEPLOY_KEY ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_ADDRESS }} "echo 'SSH connection successful!'"
 
       - name: Deploy Code to Dev Server
+        env:
+          DEPLOY_KEY: deploy_key.pem
         run: |
-          ssh -o StrictHostKeyChecking=no -i deploy_key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_ADDRESS }} "sudo -u www bash -c 'cd /www/wwwroot/DaziBackend && git pull origin dev'"
+          ssh -o StrictHostKeyChecking=no -i $DEPLOY_KEY ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_ADDRESS }} "sudo -u www bash -c 'cd /www/wwwroot/DaziBackend && git pull origin dev'"
+          rm -f $DEPLOY_KEY
