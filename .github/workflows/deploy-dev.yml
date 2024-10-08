@@ -25,9 +25,9 @@ jobs:
             username: ${{ secrets.SERVER_USER }}
             key_path: deploy_key.pem
             script: |
-              su www
+              sudo -u www bash -c '
               cd /www/wwwroot/DaziBackend
-              git pull origin dev
+              git pull origin dev'
     
       - name: Cleanup
         run: rm -f deploy_key.pem
