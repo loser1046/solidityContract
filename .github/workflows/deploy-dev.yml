@@ -1,0 +1,29 @@
+name: Deploy to Development Server
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
+          ssh-add private_key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to server as www user
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_ADDRESS }} "sudo -u www bash -c 'cd /www/wwwroot/DaziBackend && git pull origin dev'"
+        env:
+          SERVER_ADDRESS: ${{ secrets.SERVER_ADDRESS }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
